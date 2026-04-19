@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LA Rental Finder — Westside Update (Apr 2026)</title>
+<style>
+* { box-sizing: border-box; }
+html, body { max-width: 100%; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#0f1115; color:#e8eaed; }
+header { position:sticky; top:0; z-index:10; background:#1a1d23; border-bottom:1px solid #2a2e36; padding:16px 20px; }
+h1 { margin:0 0 8px 0; font-size:20px; line-height:1.3; }
+.subtitle { color:#9ca3af; font-size:13px; margin-bottom:12px; }
+.nav-links { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+.nav-links a { color:#3b82f6; text-decoration:none; font-size:13px; padding:6px 12px; border:1px solid #3b82f6; border-radius:6px; }
+.nav-links a.active { background:#3b82f6; color:white; }
+.controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.filter-btn { background:#2a2e36; color:#e8eaed; border:1px solid #3a3e46; padding:8px 14px; border-radius:20px; cursor:pointer; font-size:13px; transition: all 0.15s; }
+.filter-btn.active, .filter-btn:hover { background:#3b82f6; border-color:#3b82f6; }
+select { background:#2a2e36; color:#e8eaed; border:1px solid #3a3e46; padding:8px 12px; border-radius:8px; font-size:14px; max-width:100%; }
+.grid { display:grid; gap:16px; padding:16px; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); }
+@media (max-width: 640px) {
+  header { padding:12px 14px; }
+  h1 { font-size:17px; }
+  .grid { padding:12px; gap:12px; grid-template-columns: 1fr; }
+  .filter-btn { font-size:12px; padding:6px 12px; }
+  .card-body { padding:12px; }
+  .price { font-size:16px; }
+}
+.card { background:#1a1d23; border-radius:12px; overflow:hidden; border:1px solid #2a2e36; cursor:pointer; transition:transform 0.15s,border-color 0.15s; }
+.card:hover { transform:translateY(-2px); border-color:#3b82f6; }
+.card-thumb { position:relative; width:100%; padding-top:66%; overflow:hidden; background:#0f1115; }
+.card-thumb > img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; }
+.card-badges { position:absolute; top:10px; left:10px; display:flex; gap:6px; flex-wrap:wrap; }
+.badge { font-size:11px; padding:4px 10px; border-radius:12px; color:white; font-weight:600; }
+.card-body { padding:14px; }
+.card-header { display:flex; justify-content:space-between; margin-bottom:6px; }
+.price { font-size:17px; font-weight:700; color:#10b981; }
+.neighborhood { font-size:12px; color:#9ca3af; text-transform:uppercase; letter-spacing:0.5px; }
+.address { font-size:13px; color:#d1d5db; margin-bottom:8px; }
+.stats { display:flex; gap:10px; font-size:12px; color:#9ca3af; margin-bottom:8px; flex-wrap:wrap; }
+.listing-link { display:inline-block; font-size:12px; color:#3b82f6; text-decoration:none; margin-top:4px; }
+.listing-link:hover { text-decoration:underline; }
+.hidden { display:none !important; }
+.stats-summary { margin-left:auto; color:#9ca3af; font-size:12px; }
+.legend { display:flex; gap:12px; margin-top:8px; flex-wrap:wrap; }
+.legend-item { display:flex; align-items:center; gap:4px; font-size:11px; color:#9ca3af; }
+.legend-dot { width:10px; height:10px; border-radius:50%; }
+</style></head><body>
+<header>
+  <h1>LA Rental Finder — Westside Update</h1>
+  <div class="subtitle">13 listings across 3 neighborhoods. 4+BR, $1k-$25k/mo, 4,000-10,000 sqft. Scraped Apr 19, 2026.</div>
+  <div class="nav-links">
+    <a href="https://swaggycoder67.github.io/la-rentals/" target="_blank">← Original Site</a>
+    <a href="#" class="active">Westside (13)</a>
+  </div>
+  <div class="controls">
+    <button class="filter-btn active" data-hood="all">All (13)</button>
+    <button class="filter-btn" data-hood="brentwood" style="border-color:#10b981">Brentwood (7)</button>
+    <button class="filter-btn" data-hood="santa-monica" style="border-color:#3b82f6">Santa Monica (3)</button>
+    <button class="filter-btn" data-hood="pacific-palisades" style="border-color:#f59e0b">Pacific Palisades (3)</button>
+    <select id="sort-select">
+      <option value="price-asc">Sort: Price (low to high)</option>
+      <option value="price-desc">Sort: Price (high to low)</option>
+      <option value="sqft-desc">Sort: Size (biggest first)</option>
+    </select>
+    <span class="stats-summary" id="stats-summary"></span>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Brentwood</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Santa Monica</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Pacific Palisades</div>
+  </div>
+</header>
+<div class="grid" id="grid">
+<div class="card" data-neighborhood="brentwood"
+     data-price="12000" data-sqft="4569"
+     data-zpid="20547175">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/253b6297279d1e3873f0c8053ec06ca1-p_f.jpg" loading="lazy" alt="110 N Barrington Ave"
+         onerror="this.src='https://photos.zillowstatic.com/fp/253b6297279d1e3873f0c8053ec06ca1-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#10b981">Brentwood</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$12,000/mo</div>
+      <div class="neighborhood">Brentwood</div>
+    </div>
+    <div class="address">110 N Barrington Ave, Los Angeles, CA 90049</div>
+    <div class="stats">
+      <span>5BR</span>
+      <span>5BA</span>
+      <span>4,569 sqft</span>
+      <span>$2.63/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/110-N-Barrington-Ave-Los-Angeles-CA-90049/20547175_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="brentwood"
+     data-price="14500" data-sqft="4300"
+     data-zpid="20536987">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/0c42e7637e4513c3ca1edd1a4161ae03-p_f.jpg" loading="lazy" alt="503 N Greencraig Rd"
+         onerror="this.src='https://photos.zillowstatic.com/fp/0c42e7637e4513c3ca1edd1a4161ae03-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#10b981">Brentwood</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$14,500/mo</div>
+      <div class="neighborhood">Brentwood</div>
+    </div>
+    <div class="address">503 N Greencraig Rd, Los Angeles, CA 90049</div>
+    <div class="stats">
+      <span>4BR</span>
+      <span>6BA</span>
+      <span>4,300 sqft</span>
+      <span>$3.37/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/503-N-Greencraig-Rd-Los-Angeles-CA-90049/20536987_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="brentwood"
+     data-price="15900" data-sqft="5505"
+     data-zpid="20559685">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/6a69106c70b05d2016be42d125fd5e09-p_f.jpg" loading="lazy" alt="1425 N Tigertail Rd"
+         onerror="this.src='https://photos.zillowstatic.com/fp/6a69106c70b05d2016be42d125fd5e09-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#10b981">Brentwood</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$15,900/mo</div>
+      <div class="neighborhood">Brentwood</div>
+    </div>
+    <div class="address">1425 N Tigertail Rd, Los Angeles, CA 90049</div>
+    <div class="stats">
+      <span>5BR</span>
+      <span>6BA</span>
+      <span>5,505 sqft</span>
+      <span>$2.89/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/1425-N-Tigertail-Rd-Los-Angeles-CA-90049/20559685_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="pacific-palisades"
+     data-price="16000" data-sqft="4976"
+     data-zpid="20548178">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/f6526e5d0cc7b2c90923906d5238bd15-p_f.jpg" loading="lazy" alt="1400 Calle Del Jonella"
+         onerror="this.src='https://photos.zillowstatic.com/fp/f6526e5d0cc7b2c90923906d5238bd15-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#f59e0b">Pacific Palisades</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$16,000/mo</div>
+      <div class="neighborhood">Pacific Palisades</div>
+    </div>
+    <div class="address">1400 Calle Del Jonella, Pacific Palisades, CA 90272</div>
+    <div class="stats">
+      <span>4BR</span>
+      <span>4BA</span>
+      <span>4,976 sqft</span>
+      <span>$3.22/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/1400-Calle-Del-Jonella-Pacific-Palisades-CA-90272/20548178_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="brentwood"
+     data-price="16495" data-sqft="4488"
+     data-zpid="20558730">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/12a393a952b5f396c90c5dc70c2bf63a-p_f.jpg" loading="lazy" alt="2305 Canyonback Rd"
+         onerror="this.src='https://photos.zillowstatic.com/fp/12a393a952b5f396c90c5dc70c2bf63a-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#10b981">Brentwood</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$16,495/mo</div>
+      <div class="neighborhood">Brentwood</div>
+    </div>
+    <div class="address">2305 Canyonback Rd, Los Angeles, CA 90049</div>
+    <div class="stats">
+      <span>4BR</span>
+      <span>5BA</span>
+      <span>4,488 sqft</span>
+      <span>$3.68/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/2305-Canyonback-Rd-Los-Angeles-CA-90049/20558730_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="brentwood"
+     data-price="17500" data-sqft="4508"
+     data-zpid="20547054">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/0d08cb23d017675d41fcba361a621025-p_f.jpg" loading="lazy" alt="941 N Norman Pl"
+         onerror="this.src='https://photos.zillowstatic.com/fp/0d08cb23d017675d41fcba361a621025-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#10b981">Brentwood</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$17,500/mo</div>
+      <div class="neighborhood">Brentwood</div>
+    </div>
+    <div class="address">941 N Norman Pl, Los Angeles, CA 90049</div>
+    <div class="stats">
+      <span>5BR</span>
+      <span>6BA</span>
+      <span>4,508 sqft</span>
+      <span>$3.88/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/941-N-Norman-Pl-Los-Angeles-CA-90049/20547054_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="santa-monica"
+     data-price="19000" data-sqft="4000"
+     data-zpid="20472397">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/f7f8068717251aed3f0eab89aceee5bc-p_f.jpg" loading="lazy" alt="1812 Navy St"
+         onerror="this.src='https://photos.zillowstatic.com/fp/f7f8068717251aed3f0eab89aceee5bc-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#3b82f6">Santa Monica</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$19,000/mo</div>
+      <div class="neighborhood">Santa Monica</div>
+    </div>
+    <div class="address">1812 Navy St, Santa Monica, CA 90405</div>
+    <div class="stats">
+      <span>5BR</span>
+      <span>3BA</span>
+      <span>4,000 sqft</span>
+      <span>$4.75/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/1812-Navy-St-Santa-Monica-CA-90405/20472397_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="santa-monica"
+     data-price="20900" data-sqft="4722"
+     data-zpid="20469476">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/bfe4daf2c1133e42d6a380aa9f0c7296-p_f.jpg" loading="lazy" alt="1126 Yale St"
+         onerror="this.src='https://photos.zillowstatic.com/fp/bfe4daf2c1133e42d6a380aa9f0c7296-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#3b82f6">Santa Monica</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$20,900/mo</div>
+      <div class="neighborhood">Santa Monica</div>
+    </div>
+    <div class="address">1126 Yale St, Santa Monica, CA 90403</div>
+    <div class="stats">
+      <span>5BR</span>
+      <span>5BA</span>
+      <span>4,722 sqft</span>
+      <span>$4.43/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/1126-Yale-St-Santa-Monica-CA-90403/20469476_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="santa-monica"
+     data-price="21300" data-sqft="4722"
+     data-zpid="2053264623">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/06fb2cad91ebe23f92b12e4b9836b6da-p_f.jpg" loading="lazy" alt="(undisclosed Address)"
+         onerror="this.src='https://photos.zillowstatic.com/fp/06fb2cad91ebe23f92b12e4b9836b6da-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#3b82f6">Santa Monica</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$21,300/mo</div>
+      <div class="neighborhood">Santa Monica</div>
+    </div>
+    <div class="address">(undisclosed Address), Santa Monica, CA 90403</div>
+    <div class="stats">
+      <span>5BR</span>
+      <span>7BA</span>
+      <span>4,722 sqft</span>
+      <span>$4.51/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/Santa-Monica-CA-90403/2053264623_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="pacific-palisades"
+     data-price="22000" data-sqft="4382"
+     data-zpid="20541610">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/0e6cdc9fb1b6f69a88db1d2331338f58-p_f.jpg" loading="lazy" alt="530 Arbramar Ave"
+         onerror="this.src='https://photos.zillowstatic.com/fp/0e6cdc9fb1b6f69a88db1d2331338f58-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#f59e0b">Pacific Palisades</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$22,000/mo</div>
+      <div class="neighborhood">Pacific Palisades</div>
+    </div>
+    <div class="address">530 Arbramar Ave, Pacific Palisades, CA 90272</div>
+    <div class="stats">
+      <span>5BR</span>
+      <span>6BA</span>
+      <span>4,382 sqft</span>
+      <span>$5.02/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/530-Arbramar-Ave-Pacific-Palisades-CA-90272/20541610_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="pacific-palisades"
+     data-price="23000" data-sqft="5642"
+     data-zpid="20542896">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/a9f4e36694d1050288ad56d526aebfb9-p_f.jpg" loading="lazy" alt="350 Bellino Dr"
+         onerror="this.src='https://photos.zillowstatic.com/fp/a9f4e36694d1050288ad56d526aebfb9-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#f59e0b">Pacific Palisades</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$23,000/mo</div>
+      <div class="neighborhood">Pacific Palisades</div>
+    </div>
+    <div class="address">350 Bellino Dr, Pacific Palisades, CA 90272</div>
+    <div class="stats">
+      <span>5BR</span>
+      <span>5BA</span>
+      <span>5,642 sqft</span>
+      <span>$4.08/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/350-Bellino-Dr-Pacific-Palisades-CA-90272/20542896_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="brentwood"
+     data-price="24950" data-sqft="4044"
+     data-zpid="20546817">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/6ed5f48ebd22755f2be0b784036972c3-p_f.jpg" loading="lazy" alt="849 Glenmere Way"
+         onerror="this.src='https://photos.zillowstatic.com/fp/6ed5f48ebd22755f2be0b784036972c3-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#10b981">Brentwood</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$24,950/mo</div>
+      <div class="neighborhood">Brentwood</div>
+    </div>
+    <div class="address">849 Glenmere Way, Los Angeles, CA 90049</div>
+    <div class="stats">
+      <span>5BR</span>
+      <span>5BA</span>
+      <span>4,044 sqft</span>
+      <span>$6.17/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/849-Glenmere-Way-Los-Angeles-CA-90049/20546817_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+<div class="card" data-neighborhood="brentwood"
+     data-price="25000" data-sqft="6481"
+     data-zpid="20558354">
+  <div class="card-thumb">
+    <img src="https://photos.zillowstatic.com/fp/ec12ac5dc9871b0aae043c8ab0da0dd9-p_f.jpg" loading="lazy" alt="3016 Elvido Dr"
+         onerror="this.src='https://photos.zillowstatic.com/fp/ec12ac5dc9871b0aae043c8ab0da0dd9-p_e.jpg'"/>
+    <div class="card-badges">
+      <span class="badge" style="background:#10b981">Brentwood</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="card-header">
+      <div class="price">$25,000/mo</div>
+      <div class="neighborhood">Brentwood</div>
+    </div>
+    <div class="address">3016 Elvido Dr, Los Angeles, CA 90049</div>
+    <div class="stats">
+      <span>5BR</span>
+      <span>6BA</span>
+      <span>6,481 sqft</span>
+      <span>$3.86/sqft</span>
+    </div>
+    <a class="listing-link" href="https://www.zillow.com/homedetails/3016-Elvido-Dr-Los-Angeles-CA-90049/20558354_zpid/" target="_blank" rel="noopener">View on Zillow &rarr;</a>
+  </div>
+</div>
+</div>
+<script>
+const grid = document.getElementById('grid');
+const cards = Array.from(grid.children);
+const filterBtns = document.querySelectorAll('.filter-btn');
+const sortSelect = document.getElementById('sort-select');
+const summary = document.getElementById('stats-summary');
+
+function update() {
+  const activeBtn = document.querySelector('.filter-btn.active');
+  const hood = activeBtn?.dataset.hood || 'all';
+  const sort = sortSelect.value;
+
+  let visible = cards.filter(c => {
+    if (hood === 'all') return true;
+    return c.dataset.neighborhood === hood;
+  });
+
+  visible.sort((a, b) => {
+    if (sort === 'price-asc') return +a.dataset.price - +b.dataset.price;
+    if (sort === 'price-desc') return +b.dataset.price - +a.dataset.price;
+    if (sort === 'sqft-desc') return +b.dataset.sqft - +a.dataset.sqft;
+    return 0;
+  });
+
+  cards.forEach(c => c.classList.add('hidden'));
+  visible.forEach(c => {
+    c.classList.remove('hidden');
+    grid.appendChild(c);
+  });
+
+  summary.textContent = visible.length + ' shown';
+}
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    update();
+  });
+});
+
+sortSelect.addEventListener('change', update);
+
+// Click card to open listing
+cards.forEach(c => {
+  c.addEventListener('click', (e) => {
+    if (e.target.tagName === 'A') return;
+    const link = c.querySelector('.listing-link');
+    if (link) window.open(link.href, '_blank');
+  });
+});
+
+update();
+</script>
+</body></html>
